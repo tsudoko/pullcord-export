@@ -1,2 +1,3 @@
 markdown>=3.0
+markdown-urlize
 pymdown-extensions # for ~~strikethrough~~
