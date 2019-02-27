@@ -166,8 +166,8 @@ def print_html(guild, cid, msgs):
 	md = markdown.Markdown(
 		extensions=[
 			"nl2br",
-			"discord_fenced_code",
-			"discord_subset",
+			"mdext.discord_fenced_code",
+			"mdext.discord_subset",
 			"mdx_urlize",
 			"pymdownx.tilde"
 		],
