@@ -167,11 +167,10 @@ def print_html(guild, cid, msgs):
 		extensions=[
 			"nl2br",
 			"mdext.discord_fenced_code",
+			"mdext.discord_strikethrough",
 			"mdext.discord_subset",
 			"mdx_urlize",
-			"pymdownx.tilde"
-		],
-		extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}
+		]
 	)
 	first = True
 	lastauthor = None
