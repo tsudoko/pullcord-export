@@ -216,11 +216,11 @@ def print_html(guild, cid, msgs):
 				path = f"attachments/{cid}/{a}/"
 				path = glob.glob(f"{path}/*")[0]
 				# TODO: use attachment name from the log if present
-				print('	<div class="msg-attachment">')
-				print(f'		<a href="{path}">')
+				print('		<div class="msg-attachment">')
+				print(f'			<a href="{path}">')
 				# TODO: handle other file types
-				print(f'			<img class="msg-attachment" src="{path}">')
-				print("	</a>		</div>")
+				print(f'				<img class="msg-attachment" src="{path}">')
+				print("			</a>\n		</div>")
 
 
 if __name__ == "__main__":
