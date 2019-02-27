@@ -158,6 +158,16 @@ def print_text(guild, cid, msgs):
 
 
 def print_html(guild, cid, msgs):
+	md = markdown.Markdown(
+		extensions=[
+			"nl2br",
+			"fenced_code",
+			"discord_subset",
+			"mdx_urlize",
+			"pymdownx.tilde"
+		],
+		extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}
+	)
 	first = True
 	lastauthor = None
 	for _, m in msgs.items():
@@ -183,8 +193,7 @@ def print_html(guild, cid, msgs):
 		if m.content:
 			print("		", end="")
 			print('<div class="msg-content">', end="")
-			msg = mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>')
-			msg = markdown.Markdown(extensions=["nl2br", "fenced_code", "discord_subset", "mdx_urlize", "pymdownx.tilde"], extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}).convert(msg)
+			msg = md.convert(mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>'))
 			# annyoing hack, we can't pass <div class="msg-content"> to prevent
 			# adding <p>s since markdown doesn't process the text inside the div
 			if msg.startswith("<p>"):
