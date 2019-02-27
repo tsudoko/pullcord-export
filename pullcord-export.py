@@ -5,6 +5,8 @@ import glob
 import re
 import sys
 
+import md
+
 try:
 	# python 3.7+
 	datetime.datetime.fromisoformat
@@ -179,9 +181,19 @@ def print_html(guild, cid, msgs):
 			print('		<span class="msg-date">', end="")
 			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
 		if m.content:
-			print('		<div class="msg-content">')
-			print("			" + mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>').replace("\n", "<br>"))
-			print(" 	</div>")
+			print("		", end="")
+			print('<div class="msg-content">', end="")
+			msg = mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>')
+			msg = md.Markdown(extensions=["nl2br", "fenced_code", "pymdownx.tilde"], extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}).convert(msg)
+			# annyoing hack, we can't pass <div class="msg-content"> to prevent
+			# adding <p>s since markdown doesn't process the text inside the div
+			if msg.startswith("<p>"):
+				msg = msg[len("<p>"):]
+			if msg.endswith("</p>"):
+				msg = msg[:-len("</p>")]
+			msg = re.sub("</p>\n<p>", "<br /><br />", msg, flags=re.MULTILINE)
+			print(msg, end="")
+			print("</div>")
 
 		if m.attachments:
 			for a in m.attachments:
