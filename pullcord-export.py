@@ -5,7 +5,7 @@ import glob
 import re
 import sys
 
-import md
+import markdown
 
 try:
 	# python 3.7+
@@ -184,7 +184,7 @@ def print_html(guild, cid, msgs):
 			print("		", end="")
 			print('<div class="msg-content">', end="")
 			msg = mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>')
-			msg = md.Markdown(extensions=["nl2br", "fenced_code", "mdx_urlize", "pymdownx.tilde"], extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}).convert(msg)
+			msg = markdown.Markdown(extensions=["nl2br", "fenced_code", "discord_subset", "mdx_urlize", "pymdownx.tilde"], extension_configs={"pymdownx.tilde":{"smart_delete": False, "subscript": False}}).convert(msg)
 			# annyoing hack, we can't pass <div class="msg-content"> to prevent
 			# adding <p>s since markdown doesn't process the text inside the div
 			if msg.startswith("<p>"):
