@@ -73,16 +73,16 @@ class Message:
 member_re = re.compile("<@!?([0-9]+)>")
 role_re = re.compile("<@&([0-9]+)>")
 channel_re = re.compile("<#([0-9]+)>") # TODO
-def mention(guild, date, msg):
+def mention(guild, date, msg, wrap=lambda a: a):
 	def member_name(m):
 		id, *_ = m.groups()
 		member = close_to(guild["member"][id], date).fields
-		return "@" + (member.nick or member.name)
+		return wrap("@" + (member.nick or member.name))
 
 	def role_name(m):
 		id, *_ = m.groups()
 		role = close_to(guild["role"][id], date).fields
-		return "@" + role[0]
+		return wrap("@" + role[0])
 	msg = member_re.sub(member_name, msg)
 	msg = role_re.sub(role_name, msg)
 	return msg
@@ -154,6 +154,47 @@ def print_text(guild, cid, msgs):
 				print(f"{url} ", end="")
 		print()
 
+
+def print_html(guild, cid, msgs):
+	first = True
+	lastauthor = None
+	for _, m in msgs.items():
+		date = datetime.datetime.fromtimestamp(m.timestamp(), datetime.timezone.utc)
+		author = close_to(guild["member"][m.author], date).fields
+		if lastauthor != m.author:
+			if not first:
+				print("</div></div>")
+			first = False
+			lastauthor = m.author
+			print('<div class="msg">')
+			print('	<div class="msg-left">')
+			av = glob.glob(f"avatars/{m.author}/{author.avatar}.*")
+			if av:
+				av = av[0]
+				print(f'		<img class="msg-avatar" src="{av}">')
+			print("	</div>")
+			print('	<div class="msg-right">')
+			# TODO: escape HTML?
+			print(f'		<span class="msg-user" title="{author.nick}#{author.discriminator}">{author.nick or author.name}</span>')
+			print('		<span class="msg-date">', end="")
+			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
+		if m.content:
+			print('		<div class="msg-content">')
+			print("			" + mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>').replace("\n", "<br>"))
+			print(" 	</div>")
+
+		if m.attachments:
+			for a in m.attachments:
+				path = f"attachments/{cid}/{a}/"
+				path = glob.glob(f"{path}/*")[0]
+				# TODO: use attachment name from the log if present
+				print('	<div class="msg-attachment">')
+				print(f'		<a href="{path}">')
+				# TODO: handle other file types
+				print(f'			<img class="msg-attachment" src="{path}">')
+				print("	</a>		</div>")
+
+
 if __name__ == "__main__":
 	_, gid, cid, *_ = sys.argv
 	with open(f"channels/{gid}/guild.tsv") as f:
@@ -161,4 +202,4 @@ if __name__ == "__main__":
 	with open(f"channels/{gid}/{cid}.tsv") as f:
 		msgs = read_channel(f)
 
-	print_text(guild, cid, msgs)
+	print_html(guild, cid, msgs)
