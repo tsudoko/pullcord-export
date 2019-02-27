@@ -2,7 +2,7 @@ import markdown
 from markdown.preprocessors import \
 	NormalizeWhitespace, HtmlBlockPreprocessor
 from markdown.blockprocessors import \
-	EmptyBlockProcessor, CodeBlockProcessor, ParagraphProcessor
+	EmptyBlockProcessor, ParagraphProcessor
 from markdown.inlinepatterns import \
 	BacktickInlineProcessor, BACKTICK_RE, \
 	EscapeInlineProcessor, ESCAPE_RE, \
@@ -23,7 +23,6 @@ def build_preprocessors(md, **kwargs):
 def build_block_parser(md, **kwargs):
 	p = markdown.blockparser.BlockParser(md)
 	p.blockprocessors.register(EmptyBlockProcessor(p), 'empty', 100)
-	p.blockprocessors.register(CodeBlockProcessor(p), 'code', 80)
 	p.blockprocessors.register(ParagraphProcessor(p), 'paragraph', 10)
 	return p
 
