@@ -208,6 +208,7 @@ def print_html(guild, cid, msgs):
 			if msg.endswith("</p>"):
 				msg = msg[:-len("</p>")]
 			msg = re.sub("</p>\n<p>", "<br /><br />", msg, flags=re.MULTILINE)
+			msg = re.sub("</?p>", "", msg)
 			print(msg, end="")
 			print("</div>")
 
