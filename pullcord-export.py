@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import collections
 import datetime
+import glob
 import re
 import sys
 
@@ -69,6 +70,23 @@ class Message:
 	def timestamp(self):
 		return ((int(self.id) >> 22) + 1420070400000)/1000
 
+member_re = re.compile("<@!?([0-9]+)>")
+role_re = re.compile("<@&([0-9]+)>")
+channel_re = re.compile("<#([0-9]+)>") # TODO
+def mention(guild, date, msg):
+	def member_name(m):
+		id, *_ = m.groups()
+		member = close_to(guild["member"][id], date).fields
+		return "@" + (member.nick or member.name)
+
+	def role_name(m):
+		id, *_ = m.groups()
+		role = close_to(guild["role"][id], date).fields
+		return "@" + role[0]
+	msg = member_re.sub(member_name, msg)
+	msg = role_re.sub(role_name, msg)
+	return msg
+
 def unescape_msg(msg):
 	return msg.replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
 
@@ -119,18 +137,21 @@ def close_to(versions, dt):
 	return ret
 
 
-def print_text(guild, msgs):
+def print_text(guild, cid, msgs):
 	for _, m in msgs.items():
 		date = datetime.datetime.fromtimestamp(m.timestamp(), datetime.timezone.utc)
 		author = close_to(guild["member"][m.author], date).fields
 		print(f"[{date.strftime('%Y-%m-%d %H:%M:%S')}] {author.nick or author.name}: ", end="")
 		if m.content:
-			print(m.content, end="")
+			print(mention(guild, date, m.content), end=" ")
 
 		if m.attachments:
 			for a in m.attachments:
-				# TODO: actual URLs maybe
-				print(f" [attachment {a}]", end="")
+				path = f"attachments/{cid}/{a}/"
+				path = glob.glob(f"{path}/*")[0]
+				url = "https://cdn.discordapp.com/" + path
+				# TODO: use attachment name from the log if present
+				print(f"{url} ", end="")
 		print()
 
 if __name__ == "__main__":
@@ -140,4 +161,4 @@ if __name__ == "__main__":
 	with open(f"channels/{gid}/{cid}.tsv") as f:
 		msgs = read_channel(f)
 
-	print_text(guild, msgs)
+	print_text(guild, cid, msgs)
