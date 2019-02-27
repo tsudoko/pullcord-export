@@ -5,8 +5,6 @@ import glob
 import re
 import sys
 
-import markdown
-
 try:
 	# python 3.7+
 	datetime.datetime.fromisoformat
@@ -158,6 +156,7 @@ def print_text(guild, cid, msgs):
 
 
 def print_html(guild, cid, msgs):
+	import markdown
 	md = markdown.Markdown(
 		extensions=[
 			"nl2br",
