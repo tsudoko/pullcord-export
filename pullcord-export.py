@@ -155,6 +155,12 @@ def print_text(guild, cid, msgs):
 		print()
 
 
+# TODO: animated emoji
+emoji_re = re.compile("<:([^:]+):([0-9]+)>")
+def emoji_img(m):
+	name, id = m.groups()
+	return f'<img class="emoji" title=":{name}:" src="emojis/{id}.png">'
+
 def print_html(guild, cid, msgs):
 	import markdown
 	md = markdown.Markdown(
@@ -192,7 +198,9 @@ def print_html(guild, cid, msgs):
 		if m.content:
 			print("		", end="")
 			print('<div class="msg-content">', end="")
-			msg = md.convert(mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>'))
+			msg = mention(guild, date, m.content, lambda c: '<span class="mention">' + c + '</span>')
+			msg = emoji_re.sub(emoji_img, msg)
+			msg = md.convert(msg)
 			# annyoing hack, we can't pass <div class="msg-content"> to prevent
 			# adding <p>s since markdown doesn't process the text inside the div
 			if msg.startswith("<p>"):
