@@ -21,7 +21,10 @@ except AttributeError:
 	del ___datetime
 
 Entry = collections.namedtuple("Entry", ["timestamp", "dead", "type", "fields"])
-Member = collections.namedtuple("Member", ["name", "discriminator", "avatar", "nick"])
+Member = collections.namedtuple("Member", ["name", "discriminator", "avatar", "nick", "roles"])
+Role = collections.namedtuple("Role", ["name", "color", "pos", "perms", "hoist"])
+def mkrole(name, color, pos, perms, hoist=''):
+	return Role(name, int(color), int(pos), int(perms), bool(hoist))
 
 def read_guild(f):
 	g = {
@@ -50,7 +53,13 @@ def read_guild(f):
 				nick, *rest = rest
 			else:
 				nick = None
-			rest = Member(name, discriminator, avatar, nick)
+			if rest:
+				roles, *rest = rest
+			else:
+				roles = ''
+			rest = Member(name, discriminator, avatar, nick, roles)
+		elif type == "role":
+			rest = mkrole(*rest)
 		g[type][id].append(Entry(datetime.datetime.fromisoformat(ts), op != "add", type, rest))
 	return g
 
@@ -178,6 +187,7 @@ def print_html(guild, cid, msgs):
 	for _, m in msgs.items():
 		date = datetime.datetime.fromtimestamp(m.timestamp(), datetime.timezone.utc)
 		author = close_to(guild["member"][m.author], date).fields
+		roles = sorted(((r, close_to(guild["role"][r], date).fields) for r in author.roles.split(',')), key=lambda r: r[1].pos)
 		if lastauthor != m.author:
 			if not first:
 				print("</div></div>")
@@ -191,7 +201,10 @@ def print_html(guild, cid, msgs):
 				print(f'		<img class="msg-avatar" src="{html.escape(av)}">')
 			print("	</div>")
 			print('	<div class="msg-right">')
-			print(f'		<span class="msg-user" title="{html.escape(author.nick)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
+			print(f'		<span class="msg-user"', end="")
+			if roles[-1][1].color:
+				print(f" style=\"color: #{'%x' % roles[-1][1].color}\"", end="")
+			print(f' title="{html.escape(author.nick)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
 			print('		<span class="msg-date">', end="")
 			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
 		if m.content:
