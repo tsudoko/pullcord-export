@@ -2,6 +2,7 @@
 import collections
 import datetime
 import glob
+import html
 import re
 import sys
 
@@ -159,7 +160,7 @@ def print_text(guild, cid, msgs):
 emoji_re = re.compile("<:([^:]+):([0-9]+)>")
 def emoji_img(m):
 	name, id = m.groups()
-	return f'<img class="emoji" title=":{name}:" src="emojis/{id}.png">'
+	return f'<img class="emoji" title=":{html.escape(name)}:" src="emojis/{id}.png">'
 
 def print_html(guild, cid, msgs):
 	import markdown
@@ -187,11 +188,10 @@ def print_html(guild, cid, msgs):
 			av = glob.glob(f"avatars/{m.author}/{author.avatar}.*")
 			if av:
 				av = av[0]
-				print(f'		<img class="msg-avatar" src="{av}">')
+				print(f'		<img class="msg-avatar" src="{html.escape(av)}">')
 			print("	</div>")
 			print('	<div class="msg-right">')
-			# TODO: escape HTML?
-			print(f'		<span class="msg-user" title="{author.nick}#{author.discriminator}">{author.nick or author.name}</span>')
+			print(f'		<span class="msg-user" title="{html.escape(author.nick)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
 			print('		<span class="msg-date">', end="")
 			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
 		if m.content:
@@ -217,9 +217,9 @@ def print_html(guild, cid, msgs):
 				path = glob.glob(f"{path}/*")[0]
 				# TODO: use attachment name from the log if present
 				print('		<div class="msg-attachment">')
-				print(f'			<a href="{path}">')
+				print(f'			<a href="{html.escape(path)}">')
 				# TODO: handle other file types
-				print(f'				<img class="msg-attachment" src="{path}">')
+				print(f'				<img class="msg-attachment" src="{html.escape(path)}">')
 				print("			</a>\n		</div>")
 
 
