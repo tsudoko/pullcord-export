@@ -204,7 +204,7 @@ def print_html(guild, cid, msgs):
 			print(f'		<span class="msg-user"', end="")
 			if roles[-1][1].color:
 				print(f" style=\"color: #{'%x' % roles[-1][1].color}\"", end="")
-			print(f' title="{html.escape(author.nick)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
+			print(f' title="{html.escape(author.name)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
 			print('		<span class="msg-date">', end="")
 			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
 		if m.content:
