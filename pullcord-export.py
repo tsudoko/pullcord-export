@@ -57,7 +57,7 @@ def read_guild(f):
 				roles, *rest = rest
 			else:
 				roles = ''
-			rest = Member(name, discriminator, avatar, nick, roles)
+			rest = Member(name, int(discriminator), avatar, nick, roles)
 		elif type == "role":
 			rest = mkrole(*rest)
 		g[type][id].append(Entry(datetime.datetime.fromisoformat(ts), op != "add", type, rest))
@@ -196,15 +196,14 @@ def print_html(guild, cid, msgs):
 			print('<div class="msg">')
 			print('	<div class="msg-left">')
 			av = glob.glob(f"avatars/{m.author}/{author.avatar}.*")
-			if av:
-				av = av[0]
-				print(f'		<img class="msg-avatar" src="{html.escape(av)}">')
+			av = av[0] if av else f"embed/avatars/{author.discriminator%5}.png"
+			print(f'		<img class="msg-avatar" src="{html.escape(av)}">')
 			print("	</div>")
 			print('	<div class="msg-right">')
 			print(f'		<span class="msg-user"', end="")
 			if roles[-1][1].color:
 				print(f" style=\"color: #{'%x' % roles[-1][1].color}\"", end="")
-			print(f' title="{html.escape(author.name)}#{html.escape(author.discriminator)}">{html.escape(author.nick or author.name)}</span>')
+			print(f' title="{html.escape(author.name)}#{author.discriminator}">{html.escape(author.nick or author.name)}</span>')
 			print('		<span class="msg-date">', end="")
 			print(f"{date.strftime('%Y-%m-%d %H:%M:%S')}</span>")
 		if m.content:
