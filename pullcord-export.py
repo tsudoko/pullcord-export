@@ -6,6 +6,8 @@ import html
 import re
 import sys
 
+# this is a mess right now, feel free to make it less bad if you feel like it
+
 try:
 	# python 3.7+
 	datetime.datetime.fromisoformat
