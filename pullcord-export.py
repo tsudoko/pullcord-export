@@ -242,9 +242,9 @@ def print_html(guild, cid, msgs):
 
 if __name__ == "__main__":
 	_, gid, cid, *_ = sys.argv
-	with open(f"channels/{gid}/guild.tsv") as f:
+	with open(f"channels/{gid}/guild.tsv", newline="\n") as f:
 		guild = read_guild(f)
-	with open(f"channels/{gid}/{cid}.tsv") as f:
+	with open(f"channels/{gid}/{cid}.tsv", newline="\n") as f:
 		msgs = read_channel(f)
 
 	print_html(guild, cid, msgs)
