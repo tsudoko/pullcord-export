@@ -122,8 +122,11 @@ def read_channel(f):
 				msgs[id].reactions = reactbuf[1]
 				reactbuf = (None, [])
 			if rest:
-				editedtime, tts, content, *_ = rest
+				editedtime, *rest = rest
 				msgs[id].editedtime = editedtime if editedtime else None
+				# FIXME: handle variable number of fields properly instead of doing these kinds of hacks
+				if rest:
+					tts, content, *_ = rest
 				msgs[id].content = unescape_msg(content)
 		elif type == "attachment":
 			msgid, *_ = rest
