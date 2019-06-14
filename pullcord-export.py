@@ -88,13 +88,21 @@ channel_re = re.compile("<#([0-9]+)>") # TODO
 def mention(guild, date, msg, wrap=lambda a: a):
 	def member_name(m):
 		id, *_ = m.groups()
-		member = close_to(guild["member"][id], date).fields
-		return wrap("@" + (member.nick or member.name))
+		o = guild["member"].get(id)
+		if o:
+			member = close_to(o, date).fields
+			return wrap("@" + (member.nick or member.name))
+		else:
+			return m.group(0)
 
 	def role_name(m):
 		id, *_ = m.groups()
-		role = close_to(guild["role"][id], date).fields
-		return wrap("@" + role[0])
+		o = guild["role"].get(id)
+		if o:
+			role = close_to(o, date).fields
+			return wrap("@" + role[0])
+		else:
+			return m.group(0)
 	msg = member_re.sub(member_name, msg)
 	msg = role_re.sub(role_name, msg)
 	return msg
